@@ -1,7 +1,6 @@
-const config = require('../config.json');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../helpers/db');
+const generateAccessToken = require('../helpers/generateAccessToken');
 
 module.exports = {
     authenticate,
@@ -15,7 +14,8 @@ async function authenticate({ email, password }) {
         throw 'Email or password is incorrect';
 
     // authentication successful
-    const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
+    const token = await generateAccessToken({ user_id: user.id });
+
     return { ...omitHash(user.get()), token };
 }
 
@@ -28,10 +28,7 @@ async function create(params) {
         params.hash = await bcrypt.hash(params.password, 10);
     }
     
-    const user = await db.User.create(params);
-    // authentication successful
-    const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
-    return { ...omitHash(user.get()), token };
+    await db.User.create(params);
 }
 
 function omitHash(user) {

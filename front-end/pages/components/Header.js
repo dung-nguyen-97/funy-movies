@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import Link from 'next/link'
+import Link from 'next/link';
 import { fetchApi } from '../util/fetchData';
 
 export default function Header() {
@@ -12,51 +12,56 @@ export default function Header() {
   const { data: session } = useSession();
 
   const onLogin = async () => {
-    if(isLoading.current) return;
+    if (isLoading.current) return;
 
     isLoading.current = true;
-    const {ok, error} = await signIn('credentials', {
+    const { ok, error } = await signIn('credentials', {
       email: email.current.value,
       password: password.current.value,
       redirect: false,
       callbackUrl: '/'
     });
 
-    if(ok) {
+    if (ok) {
       toast.notify('Login success', {
         duration: 2,
-        type: "success"
-      })
+        type: 'success'
+      });
     } else {
       toast.notify(error, {
         duration: 2,
-        type: "error"
-      })
+        type: 'error'
+      });
     }
     isLoading.current = false;
-    
   };
 
   const onRegister = async () => {
-    if(isLoading.current) return;
+    if (isLoading.current) return;
     isLoading.current = true;
 
     try {
-      await fetchApi((`${process.env.API_URL}/users/register`))
+      await fetchApi(`${process.env.API_URL}/users/register`, {
+        method: ['POST'],
+        body: JSON.stringify({
+          email: email.current.value,
+          password: password.current.value
+        })
+      });
 
       toast.notify('Register success, please login', {
         duration: 2,
-        type: "success"
-      })
+        type: 'success'
+      });
     } catch (error) {
-      toast.notify(error, {
+      toast.notify(String(error.message), {
         duration: 2,
-        type: "error"
-      })
+        type: 'error'
+      });
     } finally {
       isLoading.current = false;
     }
-  }
+  };
 
   return (
     <div>
@@ -79,16 +84,16 @@ export default function Header() {
                 Welcome <span className='font-bold'>{session.user?.email}</span>
               </p>
               <Link href='/share'>
-              <button
-                type='button'
-                className='text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2'
-              >
-                Share a movie
-              </button>
+                <button
+                  type='button'
+                  className='text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2'
+                >
+                  Share a movie
+                </button>
               </Link>
               <button
                 type='button'
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: '/' })}
                 className='text-white bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 from-purple-600 to-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2'
               >
                 Logout

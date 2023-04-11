@@ -11,6 +11,7 @@ app.use(cors());
 
 
 app.use('/users', require('./users/users.controller'));
+app.use('/movies', require('./movies/movie.controller'));
 
 // global error handler
 app.use(errorHandler);

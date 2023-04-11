@@ -25,3 +25,12 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
+.truncate-overflow {
+  overflow: hidden;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 10;
+-webkit-box-orient: vertical;
+}
